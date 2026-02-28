@@ -1,0 +1,17 @@
+*.yml
+*.yaml
+*.json
+*.txt
+*.log
+*.exe
+dist/
+build/
+.vscode/
+.idea/
+*.mask
+*.masked
+*.tmp
+Implement Singbox Fallback Strategy.md
+工作任务.md
+转换报告.md
+*.md
