@@ -32,6 +32,11 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 
 	report := &ConversionReport{}
 
+	finalOutbound := DefaultFinalOutbound
+	if removeEmoji {
+		finalOutbound = cleanTag(finalOutbound)
+	}
+
 	// ===== OUTBOUNDS =====
 	outbounds := []M{
 		{"type": "direct", "tag": "direct"},
@@ -100,7 +105,7 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 	// ===== ROUTE =====
 	route := M{
 		"auto_detect_interface":   true,
-		"final":                   DefaultFinalOutbound,
+		"final":                   finalOutbound,
 		"default_domain_resolver": "dns-direct",
 		"rules":                   []M{},
 		"rule_set":                []M{},
@@ -147,7 +152,7 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 	report.RuleSetCount = len(ruleSets)
 
 	// ===== DNS =====
-	dns := buildDNSConfig()
+	dns := buildDNSConfig(finalOutbound)
 
 	// ===== INBOUNDS =====
 	inbounds := buildInbounds(true)

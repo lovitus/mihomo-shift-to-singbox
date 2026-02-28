@@ -57,7 +57,7 @@ var RuleTypeMap = map[string]string{
 
 // ===== DNS CONFIG (sing-box 1.12+ new format) =====
 
-func buildDNSConfig() M {
+func buildDNSConfig(finalOutbound string) M {
 	return M{
 		"servers": []M{
 			{
@@ -84,7 +84,7 @@ func buildDNSConfig() M {
 				"server":          "dns.cloudflare.com",
 				"server_port":     443,
 				"path":            "/dns-query",
-				"detour":          DefaultFinalOutbound,
+				"detour":          finalOutbound,
 				"domain_resolver": "dns-bootstrap",
 			},
 			{
@@ -93,12 +93,12 @@ func buildDNSConfig() M {
 				"server":          "dns.google",
 				"server_port":     443,
 				"path":            "/dns-query",
-				"detour":          DefaultFinalOutbound,
+				"detour":          finalOutbound,
 				"domain_resolver": "dns-bootstrap",
 			},
 			{
-				"type":       "fakeip",
-				"tag":        "dns-fakeip",
+				"type":        "fakeip",
+				"tag":         "dns-fakeip",
 				"inet4_range": "198.18.0.0/15",
 				"inet6_range": "fc00::/18",
 			},
@@ -106,7 +106,6 @@ func buildDNSConfig() M {
 				"type":   "udp",
 				"tag":    "dns-bootstrap",
 				"server": "223.5.5.5",
-				"detour": "direct",
 			},
 		},
 		"rules": []M{
@@ -137,11 +136,11 @@ func buildInbounds(testingMode bool) []M {
 	}
 	return []M{
 		{
-			"type":         "tun",
-			"tag":          "tun-in",
+			"type":          "tun",
+			"tag":           "tun-in",
 			"inet4_address": "172.19.0.1/30",
 			"inet6_address": "fdfe:dcba:9876::1/126",
-			"auto_route":   true,
+			"auto_route":    true,
 			"strict_route":  true,
 		},
 		{
