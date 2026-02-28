@@ -66,7 +66,6 @@ func buildDNSConfig(finalOutbound string) M {
 				"server":          "doh.pub",
 				"server_port":     443,
 				"path":            "/dns-query",
-				"detour":          "direct",
 				"domain_resolver": "dns-bootstrap",
 			},
 			{
@@ -75,7 +74,6 @@ func buildDNSConfig(finalOutbound string) M {
 				"server":          "dns.alidns.com",
 				"server_port":     443,
 				"path":            "/dns-query",
-				"detour":          "direct",
 				"domain_resolver": "dns-bootstrap",
 			},
 			{
