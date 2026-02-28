@@ -104,7 +104,6 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 
 	// ===== ROUTE =====
 	route := M{
-		"auto_detect_interface":   true,
 		"final":                   finalOutbound,
 		"default_domain_resolver": "dns-direct",
 		"rules":                   []M{},

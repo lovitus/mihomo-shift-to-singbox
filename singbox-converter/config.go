@@ -134,12 +134,12 @@ func buildInbounds(testingMode bool) []M {
 	}
 	return []M{
 		{
-			"type":          "tun",
-			"tag":           "tun-in",
-			"inet4_address": "172.19.0.1/30",
-			"inet6_address": "fdfe:dcba:9876::1/126",
-			"auto_route":    true,
-			"strict_route":  true,
+			"type":                     "tun",
+			"tag":                      "tun-in",
+			"inet4_address":            "172.19.0.1/30",
+			"auto_route":               true,
+			"strict_route":             true,
+			"endpoint_independent_nat": true,
 		},
 		{
 			"type":        "mixed",
