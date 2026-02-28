@@ -1,0 +1,13 @@
+*.yml
+*.yaml
+*.json
+*.txt
+*.log
+*.exe
+dist/
+build/
+.vscode/
+.idea/
+*.mask
+*.masked
+*.tmp
