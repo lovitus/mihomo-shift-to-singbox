@@ -50,6 +50,7 @@ func main() {
 
 func handleConvertConfig(w http.ResponseWriter, r *http.Request) {
 	useFallback := r.URL.Query().Get("fallback") == "true"
+	removeEmoji := r.URL.Query().Get("emoji") == "false"
 
 	rawURL := r.URL.Query().Get("url")
 	if rawURL == "" {
@@ -61,14 +62,14 @@ func handleConvertConfig(w http.ResponseWriter, r *http.Request) {
 				httpError(w, fmt.Sprintf("failed to read file: %v", err), http.StatusBadRequest)
 				return
 			}
-			convertAndRespond(w, data, useFallback)
+			convertAndRespond(w, data, useFallback, removeEmoji)
 			return
 		}
 		httpError(w, "missing 'url' parameter", http.StatusBadRequest)
 		return
 	}
 
-	log.Printf("Converting mihomo config from: %s (fallback=%v)", rawURL, useFallback)
+	log.Printf("Converting mihomo config from: %s (fallback=%v, removeEmoji=%v)", rawURL, useFallback, removeEmoji)
 
 	resp, err := httpClient.Get(rawURL)
 	if err != nil {
@@ -88,11 +89,11 @@ func handleConvertConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	convertAndRespond(w, body, useFallback)
+	convertAndRespond(w, body, useFallback, removeEmoji)
 }
 
-func convertAndRespond(w http.ResponseWriter, yamlData []byte, useFallback bool) {
-	result, report, err := ConvertMihomoToSingbox(yamlData, selfURL, useFallback)
+func convertAndRespond(w http.ResponseWriter, yamlData []byte, useFallback bool, removeEmoji bool) {
+	result, report, err := ConvertMihomoToSingbox(yamlData, selfURL, useFallback, removeEmoji)
 	if err != nil {
 		httpError(w, fmt.Sprintf("conversion failed: %v", err), http.StatusInternalServerError)
 		return

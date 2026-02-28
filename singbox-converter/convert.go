@@ -24,7 +24,7 @@ type ConversionReport struct {
 type M = map[string]interface{}
 
 // ConvertMihomoToSingbox converts mihomo YAML config bytes to a sing-box config map
-func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallback bool) (M, *ConversionReport, error) {
+func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallback bool, removeEmoji bool) (M, *ConversionReport, error) {
 	var mihomo M
 	if err := yaml.Unmarshal(yamlData, &mihomo); err != nil {
 		return nil, nil, fmt.Errorf("yaml parse error: %w", err)
@@ -48,6 +48,14 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 		}
 		sb := convertProxy(p)
 		if sb != nil {
+			if removeEmoji {
+				if tag, ok := sb["tag"].(string); ok {
+					sb["tag"] = cleanTag(tag)
+				}
+				if detour, ok := sb["detour"].(string); ok {
+					sb["detour"] = cleanTag(detour)
+				}
+			}
 			outbounds = append(outbounds, sb)
 			proxyTags[getString(sb, "tag")] = true
 		} else {
@@ -65,6 +73,21 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 		}
 		sbGroup := convertGroup(g, useFallback)
 		if sbGroup != nil {
+			if removeEmoji {
+				if tag, ok := sbGroup["tag"].(string); ok {
+					sbGroup["tag"] = cleanTag(tag)
+				}
+				if defaultOut, ok := sbGroup["default"].(string); ok {
+					sbGroup["default"] = cleanTag(defaultOut)
+				}
+				if outboundsSlice, ok := sbGroup["outbounds"].([]interface{}); ok {
+					for idx, o := range outboundsSlice {
+						if obStr, ok2 := o.(string); ok2 {
+							outboundsSlice[idx] = cleanTag(obStr)
+						}
+					}
+				}
+			}
 			outbounds = append(outbounds, sbGroup)
 			groupTags[getString(sbGroup, "tag")] = true
 			if getSlice(g, "use") != nil {
@@ -97,6 +120,11 @@ func ConvertMihomoToSingbox(yamlData []byte, converterBaseURL string, useFallbac
 		}
 		sbRule := parseMihomoRule(ruleStr)
 		if sbRule != nil {
+			if removeEmoji {
+				if outbound, ok := sbRule["outbound"].(string); ok {
+					sbRule["outbound"] = cleanTag(outbound)
+				}
+			}
 			rules = append(rules, sbRule)
 		}
 	}
@@ -603,4 +631,13 @@ func toM(v interface{}) M {
 	default:
 		return nil
 	}
+}
+
+var emojiStripRegex = regexp.MustCompile(`[^\p{L}\p{N}\p{P}\p{Z}\p{Sm}\p{Sc}\p{Sk}]+`)
+var spaceCleanupRegex = regexp.MustCompile(`\s+`)
+
+func cleanTag(tag string) string {
+	cleaned := emojiStripRegex.ReplaceAllString(tag, "")
+	cleaned = spaceCleanupRegex.ReplaceAllString(cleaned, " ")
+	return strings.TrimSpace(cleaned)
 }
